@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Smart Doorbell</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eaf4ef;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      width: 85%;
+      max-width: 400px;
+      padding: 25px;
+      border-radius: 18px;
+      box-shadow: 0 5px 20px #aaa;
+    }
+
+    h1 {
+      text-align: center;
+      color: #087c48;
+    }
+
+    p {
+      text-align: center;
+      color: #555;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 7px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 15px;
+      border: none;
+      border-radius: 9px;
+      background: #087c48;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: gray;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>SMART DOORBELL</h1>
+
+  <p>Welcome! Please register your visit.</p>
+
+  <form id="visitorForm">
+
+    <label>Visitor Name</label>
+    <input type="text" id="name"
+           placeholder="Enter your name" required>
+
+    <label>Purpose of Visit</label>
+    <select id="purpose" required>
+      <option value="">Select purpose</option>
+      <option>Personal Visit</option>
+      <option>Official Work</option>
+      <option>Delivery</option>
+      <option>Other</option>
+    </select>
+
+    <label>Message</label>
+    <textarea id="message"
+              placeholder="Enter your message"></textarea>
+
+    <button type="submit" id="ringButton">
+      RING BELL
+    </button>
+
+  </form>
+
+  <p id="status"></p>
+
+</div>
+
+<script>
+
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbyasF96TM5vIGTGOB7uATGcoWY5gkQ-XtBNUPbmibW0IHJPzG7G2-EzKZTAAFkRXNxRng/exec";
+
+document.getElementById("visitorForm")
+.addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    const button =
+        document.getElementById("ringButton");
+
+    const status =
+        document.getElementById("status");
+
+    const name =
+        document.getElementById("name").value.trim();
+
+    const purpose =
+        document.getElementById("purpose").value;
+
+    const message =
+        document.getElementById("message").value.trim();
+
+    if (!name || !purpose) {
+        status.style.color = "red";
+        status.innerText =
+            "Please enter your name and purpose.";
+        return;
+    }
+
+    button.disabled = true;
+    button.innerText = "SENDING...";
+
+    const data = new URLSearchParams();
+
+    data.append("name", name);
+    data.append("purpose", purpose);
+    data.append("message", message);
+
+    try {
+
+        await fetch(API_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: data
+        });
+
+        status.style.color = "green";
+        status.innerText =
+            "Request sent! Please wait for the bell.";
+
+        document.getElementById("visitorForm").reset();
+
+    } catch (error) {
+
+        status.style.color = "red";
+        status.innerText =
+            "Network error! Check your internet connection.";
+
+        console.error(error);
+
+    }
+
+    button.disabled = false;
+    button.innerText = "RING BELL";
+
+});
+
+
+</script>
+
+</body>
+</html>
